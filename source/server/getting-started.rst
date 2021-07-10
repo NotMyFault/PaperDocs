@@ -10,8 +10,13 @@ Requirements
 ~~~~~~~~~~~~
 
 Paper requires **Java 8** or newer to run. It should run fine on newer versions
-as well, such as Java 11, but certain plugins may have issues. Generally, LTS
+as well, such as Java 11 and 16, but certain plugins may have issues. Generally, LTS
 versions of Java are best supported, though you may have luck on newer versions.
+
+.. warning::
+  **Java 16** will be required for future releases starting with Minecraft 1.17.
+  If you are deploying a new server, consider starting with Java 16. 
+  More information about this transition is available `here <https://papermc.io/forums/t/java-16-mc-1-17-and-paper/5615/>`_.
 
 Migrating From Vanilla
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -41,10 +46,10 @@ Running The Server
 To run the server, simply start it up like any other Java application.
 
 Open your terminal, navigate to the saved location, and then run
-``java -Xms2G -Xmx2G -jar paper-###.jar``
+``java -Xms2G -Xmx2G -jar paper-###.jar --nogui``
 
-The amount of RAM can be set by changing the numbers in the ``-Xms`` and ``-Xmx``
-arguments.
+| The amount of RAM can be set by changing the numbers in the ``-Xms`` and ``-Xmx`` arguments.
+| ``--nogui`` disables Vanilla's GUI so you don't get double interfaces when using the command line.
 
 For more advanced Java tuning, see `Aikar's tuning page <https://mcflags.emc.gs>`_.
 

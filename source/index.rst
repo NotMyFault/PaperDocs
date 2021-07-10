@@ -40,11 +40,12 @@ configuring it, maintaining plugins, and general best practices.
     :titlesonly:
 
     server/index
+    java-update/index
 
-Running A Waterfall or Travertine Proxy
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Running A Waterfall Proxy
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Running a Waterfall or Travertine proxy is also easy. This section will cover common tasks such as
+Running a Waterfall proxy is also easy. This section will cover common tasks such as
 configuring it, maintaining plugins, and general best practices.
 
 .. toctree::

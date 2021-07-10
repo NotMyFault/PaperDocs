@@ -20,13 +20,19 @@ their respective documentation pages.
     information here to be incomplete. If you cannot find what you're looking for
     or think something may be wrong, :doc:`../about/contact`
 
-    Last updated January 30th, 2021 for MC 1.16.5, Paper build #457
+    Last updated June 24th, 2021 for MC 1.16.5, Paper build #778
 
 Global Settings
 ===============
 
 Global settings affect all worlds on the server as well as the core server
 functionality itself.
+
+use-display-name-in-quit-message
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* **default**: false
+* **description**: Sets whether the server should use the player's display name
+  in quit messages.
 
 verbose
 ~~~~~~~
@@ -68,6 +74,14 @@ max-joins-per-tick
 * **description**: Sets the maximum amount of players that may join the server
   in a single tick. If more players join, they will be postponed until later ticks
   to join.
+
+track-plugin-scoreboards
+~~~~~~~~~~~~~~~~~~~~~~~~
+* **default**: false
+* **description**: Whether the server should track plugin scoreboards with only
+  dummy objectives. This is a breaking change; however, it provides a much more
+  sensible default value. Enabling this with plugins using many scoreboards will
+  incur a performance degradation.
 
 suggest-player-names-when-null-tab-completions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -120,6 +134,12 @@ save-empty-scoreboard-teams
 * **description**: Some scoreboard plugins leave hundreds of empty scoreboard
   teams around, dramatically slowing down login times. This sets whether the
   server should remove those empty teams automatically.
+
+log-named-entity-deaths
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* **default**: true
+* **description**:  Since 1.17.1, all deaths of named entities are logged. 
+  This setting allows you to control this behavior. 
 
 velocity-support
 ~~~~~~~~~~~~~~~~
@@ -261,7 +281,8 @@ timings
       reports.
 
 * hidden-config-entries
-    - **default**: { database, settings.bungeecord-addresses }
+    - **default**: { database, settings.bungeecord-addresses,
+      settings.velocity-support.secret }
     - **description**: Configuration entries to hide in Timings reports.
 
 * history-interval
@@ -278,6 +299,40 @@ timings
 * server-name
     - **default**: Unknown Server
     - **description**: Instructs timings on what to put in for the server name.
+
+console
+~~~~~~~
+* enable-brigadier-highlighting
+    - **default**: true
+    - **description**: Enables Mojang's Brigadier highlighting in the server console.
+
+* enable-brigadier-completions
+    - **default**: true
+    - **description**: Enables Mojang's Brigadier command completions in the server console.
+
+item-validation
+~~~~~~~~~~~~~~~
+* display-name
+    - **default**: 8192
+    - **description**: Overrides Spigot's limit on item display name length.
+* loc-name
+    - **default**: 8192
+    - **description**: Overrides Spigot's limit on translatable item name
+      length.
+* lore-title
+    - **default**: 8192
+    - **description**: Overrides Spigot's limit on lore title length.
+* book
+    * title
+        - **default**: 8192
+        - **description**: Overrides Spigot's limit on book title length.
+    * author
+        - **default**: 8192
+        - **description**: Overrides Spigot's limit on book author length.
+    * page
+        - **default**: 16384
+        - **description**: Overrides Spigot's limit on individual book page
+          length.
 
 World Settings
 ==============
@@ -419,8 +474,8 @@ duplicate-uuid-saferegen-delete-range
 * **description**: If multiple entities with duplicate UUIDs are within this
   many blocks, saferegen will delete all but 1 of them.
 
-phantoms-do-no-spawn-on-creative-players
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+phantoms-do-not-spawn-on-creative-players
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * **default**: true
 * **description**: Disables spawning of phantoms on players in creative mode
 
@@ -471,6 +526,18 @@ parrots-are-unaffected-by-player-movement
 * **description**: Makes parrots "sticky" so they do not fall off a player's
   shoulder when they move. Use crouch to shake them off.
 
+only-players-collide
+~~~~~~~~~~~~~~~~~~~~
+* **default**: false
+* **description**: Only calculate collisions if a player is one of the two entities
+  colliding.
+
+allow-vehicle-collisions
+~~~~~~~~~~~~~~~~~~~~~~~~
+* **default**: false
+* **description**: Whether vehicles should also be able to collide while
+  ``only-players-collide`` is enabled.
+
 allow-non-player-entities-on-scoreboards
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * **default**: false
@@ -491,6 +558,11 @@ portal-create-radius
 * **default**: 16
 * **description**: The maximum range the server will try to create a portal around
   when generating a new portal
+
+portal-search-vanilla-dimension-scaling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* **default**: true
+* **description**: Whether to apply vanilla dimension scaling to ``portal-search-radius``.
 
 disable-thunder
 ~~~~~~~~~~~~~~~
@@ -524,6 +596,14 @@ container-update-tick-rate
 * **default**: 1
 * **description**: The rate, in ticks, at which the server updates containers
   and inventories.
+
+fix-items-merging-through-walls
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* **default**: false
+* **description**: Whether items should be prevented from merging
+  through walls. Enabling this will incur a performance degradation.This is
+  only necessary when ``merge-radius.item`` (spigot.yml) is large enough to
+  merge items through walls.
 
 prevent-tnt-from-moving-in-water
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -677,6 +757,11 @@ game-mechanics
     - **description**: Instructs the server to ignore shooter velocity when
       calculating the velocity of a fired arrow.
 
+* disable-mob-spawner-spawn-egg-transformation
+    - **default**: false
+    - **description**: Whether to block players from changing the type of
+      mob spawners with a spawn egg.
+
 * fix-curing-zombie-villager-discount-exploit
     - **default**: true
     - **description**: Fixes the `exploit <https://bugs.mojang.com/browse/MC-181190>`_ used to gain massive discounts by infecting and curing a zombie villager.
@@ -711,6 +796,14 @@ max-growth-height
     - **default**: 3
     - **description**: Maximum height sugar cane / reeds blocks will naturally
       grow to.
+
+* bamboo
+    - **max**
+        - **default**: 16
+        - **description**: Maximum height bamboo will naturally grow to.
+    - **min**
+        - **default**: 11
+        - **description**: Minimum height bamboo will naturally grow to.
 
 fishing-time-range
 ~~~~~~~~~~~~~~~~~~
@@ -802,6 +895,35 @@ alt-item-despawn-rate
 
       .. _the Material enum: https://papermc.io/javadocs/paper/1.16/org/bukkit/Material.html
 
+spawn-limits
+~~~~~~~~~~~~
+* monsters:
+    - **default**: -1
+    - **description**: The number of monsters that can spawn per world. This
+      is identical to the value set in bukkit.yml, except that it can
+      be configured per world. A value of -1 will use the value in bukkit.yml.
+* animals:
+    - **default**: -1
+    - **description**: The number of animals that can spawn per world. This
+      is identical to the value set in bukkit.yml, except that it can
+      be configured per world. A value of -1 will use the value in bukkit.yml.
+* water-animals:
+    - **default**: -1
+    - **description**: The number of water animals that can spawn per world.
+      This is identical to the value set in bukkit.yml, except that it can be
+      configured per world. A value of -1 will use the value in bukkit.yml.
+* water-ambient:
+    - **default**: -1
+    - **description**: The number of ambient water creatures that can spawn per
+      world. This is identical to the value set in bukkit.yml, except that it
+      can be configured per world. A value of -1 will use the value in
+      bukkit.yml.
+* ambient:
+    - **default**: -1
+    - **description**: The number of ambient creatures that can spawn per world.
+      This is identical to the value set in bukkit.yml, except that it can be
+      configured per world. A value of -1 will use the value in bukkit.yml.
+
 hopper
 ~~~~~~
 * cooldown-when-full
@@ -860,11 +982,18 @@ anti-xray
     - **default**: false
     - **description**: Whether or not to obfuscate blocks touching lava.
 
+* use-permission
+    - **default**: false
+    - **description**: Whether or not to allow players with the ``paper.antixray.bypass`` permission to
+      bypass anti-xray. Checking this permission is disabled by default as legacy permission plugins may
+      struggle with the number of checks made. This should only be used with modern
+      permission plugins.
+
 * hidden-blocks
-   - **default**: { gold_ore, iron_ore, coal_ore, lapis_ore, mossy_cobblestone,
-     obsidian, chest, diamond_ore, redstone_ore, clay, emerald_ore, ender_chest }
-   - **description**: List of blocks to be hidden in engine mode 1.
-   - **note**: This list is using Mojang server names *not* bukkit names.
+    - **default**: { gold_ore, iron_ore, coal_ore, lapis_ore, mossy_cobblestone,
+      obsidian, chest, diamond_ore, redstone_ore, clay, emerald_ore, ender_chest }
+    - **description**: List of blocks to be hidden in engine mode 1.
+    - **note**: This list is using Mojang server names *not* bukkit names.
 
 * replacement-blocks:
     - **default**: { stone, oak_planks }
@@ -938,13 +1067,13 @@ update-pathfinding-on-block-update
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     - **default**: true
-	- ''description**: Controls whether the pathfinding of mobs is updated when a block is updated in the world. Disabling this option can improve the server performancy significantly while there is almost no noticeable effect on the game mechanics. This is recommended when there are lots of entities loaded and you have automated farms or redstone clocks.
+    - **description**: Controls whether the pathfinding of mobs is updated when a block is updated in the world. Disabling this option can improve the server performancy significantly while there is almost no noticeable effect on the game mechanics. This is recommended when there are lots of entities loaded and you have automated farms or redstone clocks.
 	
 ender-dragons-death-always-places-dragon-egg
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     - **default**: false
-	- **description**: Controls whether ender dragons should always drop dragon eggs on death
+    - **description**: Controls whether ender dragons should always drop dragon eggs on death.
 
 max-leash-distance
 ~~~~~~~~~~~~~~~~~~
@@ -956,51 +1085,93 @@ max-leash-distance
 entity-per-chunk-save-limit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * experience_orb
-  - **default**: -1
-  - **description**: Limits the number of experience orbs that are saved/loaded per chunks. A value of -1 disables this limit
+   - **default**: -1
+   - **description**: Limits the number of experience orbs that are saved/loaded per chunks. A value of -1 disables this limit
 
 * snowball
-  - **default**: -1
-  - **description**:  Limits the number of snowballs that are saved/loaded per chunks. A value of -1 disables this limit
+   - **default**: -1
+   - **description**:  Limits the number of snowballs that are saved/loaded per chunks. A value of -1 disables this limit
 
 * ender_pearl
-  - **default**: -1
-  - **description**:  Limits the number of ender pearls that are saved/loaded per chunks. A value of -1 disables this limit
+   - **default**: -1
+   - **description**:  Limits the number of ender pearls that are saved/loaded per chunks. A value of -1 disables this limit
 
 * arrow
-  - **default**: -1
-  - **description**:  Limits the number of arrows that are saved/loaded per chunks. A value of -1 disables this limit
-  
+   - **default**: -1
+   - **description**:  Limits the number of arrows that are saved/loaded per chunks. A value of -1 disables this limit
+
+unsupported-settings
+~~~~~~~~~~~~~~~~~~~~
+* fix-invulnerable-end-crystal-exploit
+    - **default**: true
+    - **description**: If set to false, the creation of
+      invulnerable end crystals will be allowed. Fixes `MC-108513 <https://bugs.mojang.com/browse/MC-108513>`_.
+
 portal-search-radius
 ~~~~~~~~~~~~~~~~~~~~
-
-  - **default**: 128
-  - **description**:
+   - **default**: 128
+   - **description**: 
 
 portal-create-radius
 ~~~~~~~~~~~~~~~~~~~~
-
-  - **default**: 16
-  - **description**: 
+   - **default**: 16
+   - **description**: 
   
 door-breaking-difficulty
 ~~~~~~~~~~~~~~~~~~~~~~~~
 * zombie
-  - **default**: ['HARD']
-  - **description**: Takes a list of difficulties at which zombies are able to break doors
+   - **default**: ['HARD']
+   - **description**: Takes a list of difficulties at which zombies are able to break doors
 
 * vindicator
-  - **default**: ['NORMAL', 'HARD']
-  - **description**: Takes a list of difficulties at which vindicators are able to break doors
+   - **default**: ['NORMAL', 'HARD']
+   - **description**: Takes a list of difficulties at which vindicators are able to break doors
 
 mobs-can-always-pick-up-loot
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * zombies
-  - **default**: false
-  - **description**: Controls whether zombies always pick up loot. If set to false, the probability that a zombie picks up items depends on the world's difficulty.
+   - **default**: false
+   - **description**: Controls whether zombies always pick up loot. If set to false, the probability that a zombie picks up items depends on the world's difficulty.
 
 * skeletons
-  - **default**: false
-  - **description**: Controls whether skeletons always pick up loot. If set to false, the probability that a skeleton picks up items depends on the world's difficulty.
-..
+   - **default**: false
+   - **description**: Controls whether skeletons always pick up loot. If set to false, the probability that a skeleton picks up items depends on the world's difficulty.
+
+  ..
     vim: set ff=unix autoindent ts=4 sw=4 tw=0 et :
+
+fix-wither-targeting-bug
+~~~~~~~~~~~~~~~~~~~~~~~~
+   - **default**: false
+   - **description**: Fixes the wither's targeting of players. See `MC-29274 <https://bugs.mojang.com/browse/MC-29274>`_.
+
+map-item-frame-cursor-limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   - **default**: 128
+   - **description**: The number of cursors (markers) allowed per map. A
+     large number of cursors may be used to lag clients.
+
+seed-based-feature-search
+~~~~~~~~~~~~~~~~~~~~~~~~~
+   - **default**: true
+   - **description**: Whether the server should check if a chunk's biome
+     (determined by world seed) can support the desired feature before loading
+     it during feature searches. This dramatically reduces the number of chunks
+     loaded during feature searches.
+   - **note**: This assumes the seed and generator have remained unchanged.
+     If your seed or world generator has been changed, features will be
+     located incorrectly.
+
+seed-based-feature-search-loads-chunks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   - **default**: true
+   - **description**: When set to false, ``seed-based-feature-search`` will
+     not load the target chunk. Instead, it will return the center of the
+     chunk. The more precise location of the feature will be returned as the
+     player loads the target chunk. While disabling this will increase
+     performance, it may lead to incorrect feature locations being returned.
+
+allow-using-signs-inside-spawn-protection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   - **default**: false
+   - **description**: Allows players to use signs while inside spawn protection.
